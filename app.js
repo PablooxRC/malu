@@ -1,41 +1,84 @@
 var createError = require('http-errors');
 var express = require('express');
-var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const qrcode = require('qrcode-terminal');
+const connectBD = require("./config/database");
+const client = require('./config/whatsApp');
+
+const whatsappRoutes = require('./routes/whatsapp.message.routes');
+const userRoutes = require('./routes/users.routes');
+const whatsappState = require('./config/whatsapp.state');
+
+const setupMcpServer = require('./mcp/server');
+const mcpHandler = setupMcpServer();
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+connectBD();
+
+client.on('qr', qr => {
+    console.log('ESCANEA EL QR EN LA CONSOLA');
+    qrcode.generate(qr, { small: true }); 
+    whatsappState.setQrPending(qr); 
+});
+
+client.on('ready', () => {
+    console.log('CLIENTE DE WHATSAPP CONECTADO');
+    
+    whatsappState.setConnected({
+        number: client.info.wid.user,
+        name: client.info.pushname
+    });
+});
+
+client.on('disconnected', (reason) => {
+    console.log('Cliente desconectado: ', reason);
+    whatsappState.clearState();
+});
+
+client.on('message_create', message => {
+  console.log('SE RECIBIO UN MENSAJE', message)
+})
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
-// catch 404 and forward to error handler
+app.post('/mcp', mcpHandler);
+app.use('/whatsapp', whatsappRoutes);
+app.use('/user', userRoutes);
+
+app.get('/status', (req, res) => {
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString()
+  });
+});
+
+
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404, 'Endpoint no encontrado'));
 });
 
-// error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({
+    error: {
+      message: err.message,
+      status: err.status || 500,
+      stack: req.app.get('env') === 'development' ? err.stack : undefined
+    }
+  });
 });
 
-module.exports = app;
+
+client.initialize();
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor API escuchando en http://localhost:${PORT}`);
+});
