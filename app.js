@@ -48,7 +48,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.post('/mcp', mcpHandler);
 app.use('/whatsapp', whatsappRoutes);
 app.use('/user', userRoutes);
 
