@@ -37,18 +37,36 @@ const userSchema = new Schema({
     expirationcode:{
         type: Date,
         select: false
+    },
+    userType: {
+        type: String,
+        enum: ['user', 'driver'],
+        default: 'user'
     }
-}, { timestamps: true });
+}, { timestamps: true, discriminatorKey: 'userType' });
+
+// Amigos y solicitudes de amistad
+userSchema.add({
+    friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    friendRequests: [{
+        from: { type: Schema.Types.ObjectId, ref: 'User' },
+        status: { type: String, enum: ['pending','accepted','declined'], default: 'pending' },
+        createdAt: { type: Date, default: Date.now },
+        respondedAt: { type: Date }
+    }]
+});
 
 userSchema.pre('save', async function (next) {
-    if(this.isModified('password')){
+    // Solo hashear password si es una cadena de texto nueva (no está hasheada)
+    if(this.isModified('password') && this.password && !this.password.startsWith('$2')){
         try{
             const salt = await bcrypt.genSalt(10);
             this.password = await bcrypt.hash(this.password, salt);
         } catch(error){next(error);}
     }
     
-    if(this.isModified('code') && this.code){
+    // Solo hashear code si es una cadena de texto nueva
+    if(this.isModified('code') && this.code && !this.code.startsWith('$2')){
         try{
             const salt = await bcrypt.genSalt(10);
             this.code = await bcrypt.hash(this.code, salt);
@@ -61,6 +79,10 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.compareCode = async function (code) {
     if(!this.code) return false;
     return await bcrypt.compare(code, this.code); 
+}
+
+userSchema.methods.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
 }
 
 const User = mongoose.model('User', userSchema);

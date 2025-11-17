@@ -9,6 +9,7 @@ const client = require('./config/whatsApp');
 
 const whatsappRoutes = require('./routes/whatsapp.message.routes');
 const userRoutes = require('./routes/users.routes');
+const driverRoutes = require('./routes/driver.routes');
 const whatsappState = require('./config/whatsapp.state');
 
 const setupMcpServer = require('./mcp/server');
@@ -25,7 +26,7 @@ client.on('qr', qr => {
 });
 
 client.on('ready', () => {
-    console.log('CLIENTE DE WHATSAPP CONECTADO');
+    //console.log('CLIENTE DE WHATSAPP CONECTADO');
     
     whatsappState.setConnected({
         number: client.info.wid.user,
@@ -34,12 +35,12 @@ client.on('ready', () => {
 });
 
 client.on('disconnected', (reason) => {
-    console.log('Cliente desconectado: ', reason);
+    //console.log('Cliente desconectado: ', reason);
     whatsappState.clearState();
 });
 
 client.on('message_create', message => {
-  console.log('SE RECIBIO UN MENSAJE', message)
+  //console.log('SE RECIBIO UN MENSAJE', message)
 })
 
 app.use(logger('dev'));
@@ -47,9 +48,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Servir archivos estáticos
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/whatsapp', whatsappRoutes);
 app.use('/user', userRoutes);
+app.use('/driver', driverRoutes);
 
 app.get('/status', (req, res) => {
   res.json({

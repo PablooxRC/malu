@@ -1,0 +1,300 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                     SCRIPTS DE PRUEBA - WINDOWS EDITION                        ║
+║                           Malu API - Polimorfismo                              ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+SCRIPTS DISPONIBLES:
+═══════════════════════════════════════════════════════════════════════════════════
+
+1. TEST_API.ps1
+   └─ Script básico automatizado
+   └─ Prueba: Registra, login, perfil, choferes, estado
+   └─ Tiempo: ~5 segundos
+   └─ Comando: .\TEST_API.ps1
+
+2. TEST_API_WINDOWS.ps1
+   └─ Script automatizado avanzado con colores y formateo
+   └─ Prueba: Todo lo anterior + más detalles
+   └─ Tiempo: ~10 segundos
+   └─ Comando: .\TEST_API_WINDOWS.ps1
+   └─ ⭐ RECOMENDADO para verificar rápidamente
+
+3. TEST_API_INTERACTIVO.ps1
+   └─ Menú interactivo paso a paso
+   └─ Prueba: Cualquier ruta manualmente
+   └─ Tiempo: Ilimitado (interactivo)
+   └─ Comando: .\TEST_API_INTERACTIVO.ps1
+   └─ ⭐ RECOMENDADO para debugging
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+FLUJO RECOMENDADO:
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─ TERMINAL 1: Iniciar Servidor ─────────────────────────────────────┐
+│ PowerShell:                                                          │
+│   cd e:\malu                                                         │
+│   npm start                                                          │
+│                                                                      │
+│ Espera a ver:                                                        │
+│   CLIENTE DE WHATSAPP CONECTADO                                     │
+│   Servidor API escuchando en http://localhost:3000                  │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌─ TERMINAL 2: Ejecutar Pruebas ─────────────────────────────────────┐
+│ PowerShell (nueva ventana):                                          │
+│   cd e:\malu                                                         │
+│                                                                      │
+│ Opción A - Prueba rápida:                                            │
+│   .\TEST_API_WINDOWS.ps1                                            │
+│                                                                      │
+│ Opción B - Prueba interactiva:                                       │
+│   .\TEST_API_INTERACTIVO.ps1                                        │
+└──────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+TEST_API_WINDOWS.ps1 - Qué prueba:
+═══════════════════════════════════════════════════════════════════════════════════
+
+✅ 1. Registra usuario con datos aleatorios
+   └─ POST /user/register
+   └─ Genera: username, password, phone únicos
+
+✅ 2. Intenta login (datos de prueba)
+   └─ POST /user/login
+   └─ Retorna: JWT token
+
+✅ 3. Obtiene perfil del usuario (requiere token)
+   └─ GET /user/profile
+   └─ Retorna: Datos completos del usuario
+
+✅ 4. Lista choferes disponibles
+   └─ GET /driver/drivers/available
+   └─ Retorna: Array de choferes con auto, calificación, etc.
+
+✅ 5. Obtiene información de un chofer
+   └─ GET /driver/driver/:id
+   └─ Retorna: Todos los datos del chofer
+
+✅ 6. Verifica estado del servidor
+   └─ GET /status
+   └─ Retorna: Status online y timestamp
+
+Salida esperada:
+───────────────
+✅ Registro exitoso
+✅ Login exitoso
+✅ Perfil obtenido
+✅ Choferes disponibles
+✅ Información del chofer
+✅ Estado del servidor
+PRUEBAS COMPLETADAS ✅
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+TEST_API_INTERACTIVO.ps1 - Menú de Opciones:
+═══════════════════════════════════════════════════════════════════════════════════
+
+MENÚ:
+────
+1. Registrar usuario
+   ├─ Pide: username, password, teléfono
+   └─ Retorna: Confirmación de registro
+
+2. Login
+   ├─ Pide: username, password
+   └─ Retorna: Token JWT + datos del usuario
+   └─ ⚠️ Necesario para otras opciones
+
+3. Obtener perfil (requiere token)
+   └─ Retorna: Datos del usuario autenticado
+
+4. Listar choferes disponibles
+   ├─ Retorna: Lista de todos los choferes
+   └─ Muestra: nombre, teléfono, auto, calificación
+
+5. Obtener info de chofer específico
+   ├─ Pide: ID del chofer
+   └─ Retorna: Datos completos del chofer
+
+6. Actualizar disponibilidad (requiere token)
+   ├─ Pide: true/false (disponible o no)
+   └─ Retorna: Confirmación
+
+7. Ver token actual
+   └─ Muestra: Token guardado en sesión
+
+8. Estado del servidor
+   └─ Retorna: Status y timestamp
+
+9. Salir
+   └─ Cierra el script
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+EJEMPLOS DE USO:
+═══════════════════════════════════════════════════════════════════════════════════
+
+CASO 1: Verificar que todo funciona
+──────────────────────────────────
+1. Abre Terminal 1: npm start
+2. Abre Terminal 2: .\TEST_API_WINDOWS.ps1
+3. ✅ Si ves "PRUEBAS COMPLETADAS", todo está bien
+
+CASO 2: Registrarse como chofer
+────────────────────────────────
+1. Terminal: .\TEST_API_INTERACTIVO.ps1
+2. Opción 1: Registra usuario
+3. Opción 2: Login
+4. Opción 6: Actualiza disponibilidad → true
+5. Opción 4: Verifica que apareces en lista
+6. Opción 9: Salir
+
+CASO 3: Probar endpoints específicos
+─────────────────────────────────────
+1. Terminal: .\TEST_API_INTERACTIVO.ps1
+2. Selecciona el endpoint que quieras probar
+3. Ingresa los datos solicitados
+4. Ve la respuesta formateada en consola
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+RESULTADOS ESPERADOS:
+═══════════════════════════════════════════════════════════════════════════════════
+
+✅ Cuando todo funciona:
+   ├─ Colores verdes ✅
+   ├─ Mensajes de "éxito"
+   └─ Respuestas JSON formateadas
+
+⚠️ Cuando algo falla:
+   ├─ Colores rojos ❌
+   ├─ Mensajes de error
+   └─ Código HTTP del error
+
+❌ Errores comunes:
+   ├─ "No se puede conectar" → npm start no está corriendo
+   ├─ "Token no proporcionado" → Debes hacer login primero
+   ├─ "Usuario no verificado" → Usuario no está activo
+   └─ "Placa ya registrada" → Datos duplicados en BD
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+ANTES DE EMPEZAR:
+═══════════════════════════════════════════════════════════════════════════════════
+
+✅ Requisitos:
+   □ Node.js instalado (npm list node)
+   □ npm install ejecutado
+   □ .env configurado con JWT_SECRET y MONGO_URI
+   □ MongoDB conectado
+   □ npm start ejecutándose en Terminal 1
+
+✅ Verificar:
+   npm list jsonwebtoken    → debe mostrar versión
+   npm list multer          → debe mostrar versión
+   npm start                → debe conectarse a WhatsApp
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+COMANDOS RÁPIDOS:
+═══════════════════════════════════════════════════════════════════════════════════
+
+# Iniciar servidor
+npm start
+
+# Script rápido
+.\TEST_API_WINDOWS.ps1
+
+# Script interactivo
+.\TEST_API_INTERACTIVO.ps1
+
+# Ver qué procesos usan puerto 3000
+netstat -ano | findstr :3000
+
+# Matar proceso en puerto 3000
+taskkill /PID <PID> /F
+
+# Ver archivos de test
+dir e:\malu\uploads\drivers
+
+# Limpiar archivos de test
+del e:\malu\uploads\drivers\*.*
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════════════════════════════
+
+P: "No se puede conectar con http://localhost:3000"
+R: Asegúrate de que npm start está corriendo en otra terminal
+
+P: "Error 404 en ruta X"
+R: Verifica que la ruta esté correcta en routes/
+
+P: "Error 401 - Token no proporcionado"
+R: Haz login primero (opción 2 en interactivo)
+
+P: "Error 500 - Error interno"
+R: Verifica logs de npm start para más detalles
+
+P: "Error de conexión a MongoDB"
+R: Verifica MONGO_URI en .env
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+CONFIGURACIÓN DE ENTORNO (.env):
+═══════════════════════════════════════════════════════════════════════════════════
+
+Archivo: e:\malu\.env
+
+Contenido requerido:
+────────────────────
+JWT_SECRET=clave-secreta-muy-fuerte
+JWT_EXPIRES_IN=7d
+MONGO_URI=mongodb+srv://usuario:contraseña@cluster.mongodb.net/malu
+PORT=3000
+NODE_ENV=development
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+DOCUMENTACIÓN:
+═══════════════════════════════════════════════════════════════════════════════════
+
+Lee estos archivos para más información:
+
+1. QUICKSTART.md
+   └─ Guía rápida de inicio
+
+2. API_DOCUMENTATION.md
+   └─ Todas las rutas de usuario
+
+3. DRIVER_ROUTES_DOCUMENTATION.md
+   └─ Todas las rutas de chofer
+
+4. WINDOWS_TESTING_GUIDE.md
+   └─ Guía completa de pruebas para Windows
+
+5. POLYMORPHISM_GUIDE.md
+   └─ Cómo funciona el polimorfismo
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+PRÓXIMOS PASOS:
+═══════════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Ejecuta .\TEST_API_WINDOWS.ps1
+2. ✅ Si todo funciona, ejecuta .\TEST_API_INTERACTIVO.ps1
+3. ✅ Prueba cada opción del menú
+4. ⏭️  Integra Flutter en tu app
+5. ⏭️  Crear panel admin para verificar documentos
+6. ⏭️  Implementar sistema de viajes
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+Fecha: 16 de noviembre de 2025
+Versión: 1.0
+Plataforma: Windows PowerShell ✅
+
+═══════════════════════════════════════════════════════════════════════════════════
